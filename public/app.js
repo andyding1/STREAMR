@@ -307,6 +307,25 @@ var AppChat = React.createClass({
     );
   }
 });
+var MainApp = React.createClass({
+  render: function() {
+    return(
+      <div id="mainApp">
+        <AppChat/>
+        <VideoApp/>
+      </div>
+    );
+  }
+});
+
+var VideoApp = React.createClass({
+  render: function() {
+    return (
+      <div id="videoApp">
+      </div>
+    );
+  }
+});
 
 // not found "page"
 var NotFound = React.createClass({
@@ -322,7 +341,7 @@ var routes = (
   <Router history={browserHistory}>
     <Route path="/" component={App}>
       <IndexRoute component={AliasPicker}/>
-      <Route path="chat" component={AppChat}/>
+      <Route path="chat" component={MainApp}/>
       <Route path="*" component={NotFound}/>
     </Route>
   </Router>

@@ -1,0 +1,10 @@
+#mainApp {
+  display: flex;
+
+}
+#chatApp {
+  flex-basis: 50%;
+}
+#videoApp {
+  flex-basis: 50%;
+}
