@@ -1,6 +1,5 @@
 #mainApp {
   display: flex;
-
 }
 #chatApp {
   flex-basis: 50%;

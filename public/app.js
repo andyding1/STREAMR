@@ -307,21 +307,22 @@ var AppChat = React.createClass({
     );
   }
 });
+
+var VideoApp = React.createClass({
+  render: function() {
+    return (
+      <div id="videoApp">
+      </div>
+    );
+  }
+});
+
 var MainApp = React.createClass({
   render: function() {
     return(
       <div id="mainApp">
         <AppChat/>
         <VideoApp/>
-      </div>
-    );
-  }
-});
-
-var VideoApp = React.createClass({
-  render: function() {
-    return (
-      <div id="videoApp">
       </div>
     );
   }
