@@ -25,13 +25,34 @@ var App = React.createClass({
     );
   }
 });
+
+var AppCombined = React.createClass({
+  getInitialState: function() {
+    return {
+      aliasPicked: false
+    }
+  },
+  aliasHasBeenPicked: function() {
+    this.setState({ aliasPicked: true});
+  },
+	render: function() {
+		return (
+      <div>
+        { this.state.aliasPicked ? <MainApp /> : <AliasPicker aliasHasBeenPicked={this.aliasHasBeenPicked} /> }
+      </div>
+		);
+	}
+})
+
 //Form for a user to pick an alias
 var AliasPicker = React.createClass({
 	enterChat: function(event) {
 		event.preventDefault();
 		var alias = this.refs.alias.value
     socket.emit('user:enter', alias);
-		browserHistory.push('/chat');
+    //this will set state for aliasPicked to true in AppCombined component to render AppChat
+    this.props.aliasHasBeenPicked();
+		// browserHistory.push('/chat');
 	},
 	render: function() {
 		return (
@@ -332,7 +353,10 @@ var MainApp = React.createClass({
 var NotFound = React.createClass({
   render: function() {
     return (
-      <h2>Not Found!</h2>
+      <div>
+        <h2>Page Not Found!</h2>
+        <a href="/" id="mainPageRedirect">Back to Main Page</a>
+      </div>
     );
   }
 });
@@ -341,8 +365,8 @@ var NotFound = React.createClass({
 var routes = (
   <Router history={browserHistory}>
     <Route path="/" component={App}>
-      <IndexRoute component={AliasPicker}/>
-      <Route path="chat" component={MainApp}/>
+      <IndexRoute component={AppCombined}/>
+      {/*<Route path="chat" component={MainApp}/>*/}
       <Route path="*" component={NotFound}/>
     </Route>
   </Router>
