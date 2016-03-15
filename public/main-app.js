@@ -11,7 +11,7 @@ var IndexRoute = ReactRouter.IndexRoute;
 var browserHistory = ReactRouter.browserHistory;
 
 
-var VideoApp = require("./app.js");
+var VideoApp = require("./videoapp.js");
 
 var io = require('socket.io-client');
 
@@ -32,16 +32,20 @@ var App = React.createClass({
 var AppCombined = React.createClass({
   getInitialState: function() {
     return {
-      aliasPicked: false
+      aliasPicked: false,
+      broadcast_id: ''
     }
   },
   aliasHasBeenPicked: function() {
     this.setState({ aliasPicked: true});
   },
+  getBroadcast: function(broadcast_id) {
+    this.setState({ broadcast_id: broadcast_id })
+  },
 	render: function() {
 		return (
       <div>
-        { this.state.aliasPicked ? <MainApp /> : <AliasPicker aliasHasBeenPicked={this.aliasHasBeenPicked} /> }
+        { this.state.aliasPicked ? <MainApp broadcast_id={this.state.broadcast_id} /> : <AliasPicker aliasHasBeenPicked={this.aliasHasBeenPicked} getBroadcast={this.getBroadcast} /> }
       </div>
 		);
 	}
@@ -51,28 +55,30 @@ var AppCombined = React.createClass({
 var AliasPicker = React.createClass({
 	enterChat: function(event) {
 		event.preventDefault();
-		var alias = this.refs.alias.value
+		var alias = this.refs.alias.value;
     socket.emit('user:enter', alias);
     //this will set state for aliasPicked to true in AppCombined component to render AppChat
-    this.props.aliasHasBeenPicked();
+    if(this.refs.alias.value && this.refs.broadcast_id.value){
+      this.props.aliasHasBeenPicked();
+      this.props.getBroadcast(this.refs.broadcast_id.value);
+    }
 		// browserHistory.push('/chat');
 	},
 	render: function() {
 		return (
-            <div>
-
-			<form onSubmit={this.enterChat} className="aliasForm" autoComplete="off">
-				<div className="header"><p>Input an Alias</p></div>
-        <div className="description">
-          <p>Enter the chatroom by inputting an alias.</p>
-        </div>
-        <div className="aliasInput">
-					<input ref="alias" type="text" id="aliasBox" className="button" placeholder="ALIAS" pattern=".{1,}" required title="Enter an Alias" maxLength="14"></input>
-					<input type="submit" className="button" value="ENTER" id="enter"></input>
-        </div>
-			</form>
-                <VideoApp />
-                </div>
+      <div>
+  			<form onSubmit={this.enterChat} className="aliasForm" autoComplete="off">
+  				<div className="header"><p>Input an Alias</p></div>
+          <div className="description">
+            <p>Enter the chatroom by inputting an alias.</p>
+          </div>
+          <div className="aliasInput">
+  					<input ref="alias" type="text" id="aliasBox" className="button" placeholder="ALIAS" pattern=".{1,}" required title="Enter an Alias" maxLength="14"></input>
+            <input ref="broadcast_id" type="text" id="broadcastBox" className="button" placeholder="BROADCAST" pattern=".{1,}" required title="Enter an Alias" maxLength="14"></input>
+            <input type="submit" className="button" value="ENTER" id="enter"></input>
+          </div>
+  			</form>
+      </div>
 		);
 	}
 })
@@ -183,8 +189,6 @@ var MessageList = React.createClass({
 		);
 	}
 });
-
-
 
 //This component is form for the user to submit a message
 var MessageForm = React.createClass({
@@ -336,13 +340,12 @@ var AppChat = React.createClass({
   }
 });
 
-
-
 var MainApp = React.createClass({
   render: function() {
     return(
       <div id="mainApp">
         <AppChat/>
+        <VideoApp broadcast_id={this.props.broadcast_id}/>
       </div>
     );
   }

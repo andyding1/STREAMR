@@ -14,13 +14,9 @@ class VideoApp extends React.Component {
             room: ''
         };
 
-        this.handleClick = this.handleClick.bind(this);
+        // this.handleClick = this.handleClick.bind(this);
         this.initRTCMultiConnection = this.initRTCMultiConnection.bind(this);
         this.handleInputChange = this.handleInputChange.bind(this);
-    }
-
-    componentDidMount(){
-
     }
 
     initRTCMultiConnection(userid) {
@@ -62,8 +58,7 @@ class VideoApp extends React.Component {
 
     }
 
-
-    handleClick() {
+    componentDidMount() {
 
         let that = this;
 
@@ -113,7 +108,7 @@ class VideoApp extends React.Component {
             }
         };
 
-        var broadcastid = this.refs.broadcast_id.value;
+        var broadcastid = this.props.broadcast_id;
 
         if (broadcastid.replace(/^\s+|\s+$/g, '').length <= 0) {
             alert('Please enter broadcast-id');
