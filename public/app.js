@@ -1,376 +1,204 @@
-var React = require('react');
-var ReactDOM = require('react-dom');
+import React from "react";
+import ReactDom from "react-dom";
+import io from "socket.io-client";
+import RTC from "./RTCMultiConnection";
 
-var ReactCSSTransitionGroup = require('react-addons-css-transition-group');
+class VideoApp extends React.Component {
 
-var ReactRouter = require('react-router');
-var Router = ReactRouter.Router;
-var Route = ReactRouter.Route;
-var Link = ReactRouter.Link;
-var IndexRoute = ReactRouter.IndexRoute;
-var browserHistory = ReactRouter.browserHistory;
+    constructor(props) {
+        super(props);
 
-var io = require('socket.io-client');
+        this.state = {
+            socket: io.connect(),
+            onMessageCallbacks: {},
+            room: ''
+        };
 
-var socket = io.connect();
-
-const ADMIN_USER = 'ADMIN'
-
-var App = React.createClass({
-  render: function() {
-    return (
-      <main>
-        {this.props.children}
-      </main>
-    );
-  }
-});
-
-var AppCombined = React.createClass({
-  getInitialState: function() {
-    return {
-      aliasPicked: false
+        this.handleClick = this.handleClick.bind(this);
+        this.initRTCMultiConnection = this.initRTCMultiConnection.bind(this);
+        this.handleInputChange = this.handleInputChange.bind(this);
     }
-  },
-  aliasHasBeenPicked: function() {
-    this.setState({ aliasPicked: true});
-  },
-	render: function() {
-		return (
-      <div>
-        { this.state.aliasPicked ? <MainApp /> : <AliasPicker aliasHasBeenPicked={this.aliasHasBeenPicked} /> }
-      </div>
-		);
-	}
-})
 
-//Form for a user to pick an alias
-var AliasPicker = React.createClass({
-	enterChat: function(event) {
-		event.preventDefault();
-		var alias = this.refs.alias.value
-    socket.emit('user:enter', alias);
-    //this will set state for aliasPicked to true in AppCombined component to render AppChat
-    this.props.aliasHasBeenPicked();
-		// browserHistory.push('/chat');
-	},
-	render: function() {
-		return (
-			<form onSubmit={this.enterChat} className="aliasForm" autoComplete="off">
-				<div className="header"><p>Input an Alias</p></div>
-        <div className="description">
-          <p>Enter the chatroom by inputting an alias.</p>
-        </div>
-        <div className="aliasInput">
-					<input ref="alias" type="text" id="aliasBox" className="button" placeholder="ALIAS" pattern=".{1,}" required title="Enter an Alias" maxLength="14"></input>
-					<input type="submit" className="button" value="ENTER" id="enter"></input>
-        </div>
-			</form>
-		);
-	}
-})
+    componentDidMount(){
 
-//This component will show all the users who are connected
-var UsersList = React.createClass({
-  getInitialState: function() {
-     return {
-         visible: false
-     };
-   },
-   show: function(e) {
-     document.addEventListener("click", this.hide);
-     this.setState({ visible: true });
-
-   },
-   hide: function() {
-     document.removeEventListener("click", this.hide);
-     this.setState({ visible: false });
-   },
-	render: function() {
-		return (
-			<div className="users menu">
-        <div className={(this.state.visible ? "visible " : "") + this.props.alignment}>
-  				<h3> Online Users </h3>
-  				<ul className="usersList">
-  					{
-  						this.props.users.map((user, i) => {
-  							return (
-  								<li key={i} className="userElement">
-  									{user}
-  								</li>
-  							);
-  						})
-  					}
-  				</ul>
-        </div>
-			</div>
-		);
-	}
-});
-
-//This component is for any message that is entered from the MessageForm Component
-var Message = React.createClass({
-  componentDidUpdate: function(){
-    //This sets the messageInputArea to automatically scroll to the bottom
-    var objDiv = document.querySelector(".messageInputArea");
-    objDiv.scrollTop = objDiv.scrollHeight;
-  },
-	render: function() {
-    var color = this.props.color;
-    var colorStyle = {
-      color: color
-    };
-    //adding specific class on admin messages for joining and leaving chat room for styling purposes
-    if (this.props.users === ADMIN_USER){
-      return (
-        <div className="message admin_message">
-          <strong>{this.props.users}: </strong>
-  				<span>{this.props.text}</span>
-  			</div>
-      );
     }
-    else {
-  		return (
-  			<div className="message" style={colorStyle}>
-          <strong>{this.props.users}: </strong>
-  				<span>{this.props.text}</span>
-  			</div>
-  		);
+
+    initRTCMultiConnection(userid) {
+
+        let that = this;
+
+        console.log("handleClick fired!");
+        let connection = new RTCMultiConnection();
+        console.log(connection, "THIS IS THE CONNECTION CREATED FROM A USER CLICK!");
+        connection.body = this.refs.videos_container;
+
+        connection.channel = connection.sessionid = connection.userid = userid || connection.userid;
+
+        connection.sdpConstraints.mandatory = {
+            OfferToReceiveAudio: false,
+            OfferToReceiveVideo: true
+        };
+
+        // using socket.io for signaling
+        connection.openSignalingChannel = function (config) {
+            let channel = config.channel || this.channel;
+            that.state.onMessageCallbacks[channel] = config.onmessage;
+            if (config.onopen) setTimeout(config.onopen, 1000);
+            return {
+                send: function (message) {
+                    that.state.socket.emit('message', {
+                        sender: connection.userid,
+                        channel: channel,
+                        message: message
+                    });
+                },
+                channel: channel
+            };
+        };
+        connection.onMediaError = function (error) {
+            alert(JSON.stringify(error));
+        };
+        return connection;
+
     }
-	}
-});
-
-//This is the component that renders all the messages
-var MessageList = React.createClass({
-	render: function() {
-
-    var messages = this.props.messages.map((message, i) => {
-      return (
-        <table className="messageTableText" key={i}>
-          <tbody>
-          <tr>
-            <td>
-            <Message
-              key={i}
-              users={message.user}
-              text={message.text}
-              color={message.color}
-            />
-            </td>
-          </tr>
-          </tbody>
-        </table>
-      );
-    })
-
-		return (
-			<div className='messages'>
-				<h3> Messages: </h3>
-        <div className='messageInputArea'>
-        <ReactCSSTransitionGroup transitionName="messageAnimation" transitionEnterTimeout={500} transitionLeaveTimeout={300}>
-            	{messages}
-        </ReactCSSTransitionGroup>
-
-        </div>
-			</div>
-		);
-	}
-});
 
 
+    handleClick() {
 
-//This component is form for the user to submit a message
-var MessageForm = React.createClass({
-	getInitialState() {
-		return {
-      text: ''
-    };
-	},
-	handleSubmit(event) {
-		event.preventDefault();
-		var message = {
-      user: this.props.user,
-			text : this.state.text
-		}
-		this.props.onMessageSubmit(message);
-		this.setState({ text: '' });
-	},
-	changeHandler(event) {
-		this.setState({text: event.target.value});
-	},
-  colorHandler(event) {
-    socket.emit('color:change', {
-      color: event.target.value
+        let that = this;
+
+        let connection = this.initRTCMultiConnection();
+        connection.getExternalIceServers = false;
+
+        this.state.socket.on('message', (data)=> {
+            if (data.sender === connection.userid) return;
+            if (this.state.onMessageCallbacks[data.channel]) {
+                this.state.onMessageCallbacks[data.channel](data.message);
+            }
+        });
+
+        connection.onstream = function(event) {
+            connection.body.appendChild(event.mediaElement);
+
+            if (connection.isInitiator == false && !connection.broadcastingConnection) {
+                // "connection.broadcastingConnection" global-level object is used
+                // instead of using a closure object, i.e. "privateConnection"
+                // because sometimes out of browser-specific bugs, browser
+                // can emit "onaddstream" event even if remote user didn't attach any stream.
+                // such bugs happen often in chrome.
+                // "connection.broadcastingConnection" prevents multiple initializations.
+
+                // if current user is broadcast viewer
+                // he should create a separate RTCMultiConnection object as well.
+                // because node.js server can allot him other viewers for
+                // remote-stream-broadcasting.
+                connection.broadcastingConnection = that.initRTCMultiConnection(connection.userid);
+
+                // to fix unexpected chrome/firefox bugs out of sendrecv/sendonly/etc. issues.
+                connection.broadcastingConnection.onstream = function() {};
+
+                connection.broadcastingConnection.session = connection.session;
+                connection.broadcastingConnection.attachStreams.push(event.stream); // broadcast remote stream
+                connection.broadcastingConnection.dontCaptureUserMedia = true;
+
+                // forwarder should always use this!
+                connection.broadcastingConnection.sdpConstraints.mandatory = {
+                    OfferToReceiveVideo: false,
+                    OfferToReceiveAudio: false
+                };
+
+                connection.broadcastingConnection.open({
+                    dontTransmit: true
+                });
+            }
+        };
+
+        var broadcastid = this.refs.broadcast_id.value;
+
+        if (broadcastid.replace(/^\s+|\s+$/g, '').length <= 0) {
+            alert('Please enter broadcast-id');
+            this.refs.broadcast_id.focus();
+            return;
+        }
+
+        connection.session = {
+            video: this.refs.broadcast_options.value.indexOf('Video') !== -1,
+            screen: this.refs.broadcast_options.value.indexOf('Screen') !== -1,
+            audio: this.refs.broadcast_options.value.indexOf('Audio') !== -1,
+            oneway: true
+        };
+
+        this.state.socket.emit('join-broadcast', {
+            broadcastid: broadcastid,
+            userid: connection.userid,
+            typeOfStreams: connection.session
+        });
+
+        this.state.socket.on('join-broadcaster', function(broadcaster, typeOfStreams) {
+            connection.session = typeOfStreams;
+            connection.channel = connection.sessionid = broadcaster.userid;
+
+            connection.sdpConstraints.mandatory = {
+                OfferToReceiveVideo: !!connection.session.video,
+                OfferToReceiveAudio: !!connection.session.audio
+            };
+
+            connection.join({
+                sessionid: broadcaster.userid,
+                userid: broadcaster.userid,
+                extra: {},
+                session: connection.session
+            });
+        });
+
+// this event is emitted when a broadcast is absent.
+        this.state.socket.on('start-broadcasting', function(typeOfStreams) {
+            // host i.e. sender should always use this!
+            connection.sdpConstraints.mandatory = {
+                OfferToReceiveVideo: false,
+                OfferToReceiveAudio: false
+            };
+            connection.session = typeOfStreams;
+            connection.open({
+                dontTransmit: true
+            });
+
+            if (connection.broadcastingConnection) {
+                // if new person is given the initiation/host/moderation control
+                connection.broadcastingConnection.close();
+                connection.broadcastingConnection = null;
+            }
+        });
+
     }
-  );
-  },
-	render: function() {
-		return(
-        <div className="messageFormDiv">
-				<form onSubmit={this.handleSubmit} className="messageForm">
-          <div className="messageInput">
-  					<input
-  						onChange={this.changeHandler}
-  						value={this.state.text}
-              className="messageButton"
-              id="messageBox"
-              autoComplete="off"
-  					/>
-            <input
-              type="color"
-              onChange={this.colorHandler}
-              className="messageButton"
-              id="colorPicker"
-            />
-            <input type="submit" value="SEND" className="messageButton" id="sendMessage"/>
-          </div>
-				</form>
-        </div>
-		);
-	}
-});
 
-//This is the component that holds the whole chat room
-var AppChat = React.createClass({
-  getInitialState: function() {
-    return{
-      users: [],
-      messages: [],
-      text: ''
+    handleInputChange(e){
+        this.setState({room: e.target.value})
     }
-  },
-  componentDidMount: function(){
-    var that = this;
-    socket.on('initialize', this.initialize);
-    socket.on('user:join', this.userJoins);
-    socket.on('user:left', this.userLeaves);
-    socket.on('send:message', this.receiveMessage);
-    socket.on('color:change', this.receiveColor);
-  },
-  initialize: function(data) {
-    var users = data.users;
-    var name = data.name;
-    this.setState({
-      users: users,
-      user: name
-    });
-  },
-  userJoins: function(data) {
-    var users = this.state.users;
-    var messages = this.state.messages;
-    var name = data.name;
-    messages.push({
-      user: ADMIN_USER,
-      text: name + ' has joined the room'
-    });
-    this.setState({
-      users: users,
-      messages: messages
-    });
-  },
-  userLeaves: function(data) {
-    console.log(data);
-    var users = data.users;
-    var messages = this.state.messages;
-    var name = data.name;
-    messages.push({
-      user: ADMIN_USER,
-      text: name + ' has left the room'
-    })
-    this.setState({
-      users: users,
-      messages: messages
-    });
-  },
-  receiveMessage: function(message) {
-      var messages = this.state.messages;
-  		messages.push(message);
-  		this.setState({
-        messages: messages
-      });
-  },
-  handleMessage: function(message) {
-    socket.emit('send:message', message);
-  },
-  receiveColor: function(color) {
-    this.setState({
-      color: color
-    });
-  },
-  //for react sliding menu
-  showLeft: function() {
-    this.refs.left.show();
-  },
-  render: function() {
-    return (
-      <div>
-        <div>
-          <button className="userButton hvr-glow" onClick={this.showLeft}>Show Users</button>
-          <UsersList
-  					users={this.state.users}
-            ref="left"
-            alignment="left"
-  				/>
-        </div>
-        <div id="appChat">
-          <div className="messageComponent">
-            <MessageList
-              messages={this.state.messages}
-              color={this.state.color}
-            />
-            <MessageForm
-              onMessageSubmit={this.handleMessage}
-              user={this.state.user}
-            />
-          </div>
-        </div>
-      </div>
-    );
-  }
-});
 
-var VideoApp = React.createClass({
-  render: function() {
-    return (
-      <div id="videoApp">
-      </div>
-    );
-  }
-});
+    render() {
+        return (
+            <div>
+                <div ref="videos_container"></div>
 
-var MainApp = React.createClass({
-  render: function() {
-    return(
-      <div id="mainApp">
-        <AppChat/>
-        <VideoApp/>
-      </div>
-    );
-  }
-});
 
-// not found "page"
-var NotFound = React.createClass({
-  render: function() {
-    return (
-      <div>
-        <h2>Page Not Found!</h2>
-        <a href="/" id="mainPageRedirect">Back to Main Page</a>
-      </div>
-    );
-  }
-});
+                <input onChange={this.handleInputChange} type="text" ref="broadcast_id" placeholder="broadcast-id" value={this.state.room}/>
+                <select ref="broadcast_options">
+                    <option>Audio+Video</option>
+                    <option title="Works only in Firefox.">Audio+Screen</option>
+                    <option>Audio</option>
+                    <option>Video</option>
+                    <option
+                        title="Screen capturing requries HTTPs. Please run this demo on HTTPs to make sure it can capture your screens.">
+                        Screen
+                    </option>
+                </select>
+                <button id="open-or-join" onClick={this.handleClick}>Open or Join Broadcast</button>
+            </div>
+        );
+    }
+}
 
-//This is setup of routes to go from AliasPicker to AppChat
-var routes = (
-  <Router history={browserHistory}>
-    <Route path="/" component={App}>
-      <IndexRoute component={AppCombined}/>
-      {/*<Route path="chat" component={MainApp}/>*/}
-      <Route path="*" component={NotFound}/>
-    </Route>
-  </Router>
-);
+module.exports = VideoApp;
 
-// If this line of code is not here, nothing gets displayed!
-ReactDOM.render(routes, document.querySelector('#app'));
+//ReactDom.render(<App />, document.querySelector("#app"));
