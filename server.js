@@ -75,7 +75,9 @@ function WebRTC_Scalable_Broadcast(app) {
 
   io.on('connection', function(socket) {
 
-
+    /*
+    CHAT SOCKET
+    */
     socket.on('user:enter', function(alias){
 
       //add the current socket user to the users array
@@ -123,8 +125,9 @@ function WebRTC_Scalable_Broadcast(app) {
 
     });
 
-
-
+    /*
+      VIDEO SOCKET
+    */
 
     var currentUser;
     socket.on('join-broadcast', function(user) {
