@@ -107,7 +107,7 @@ var UsersList = React.createClass({
 		return (
 			<div className="users menu">
         <div className={(this.state.visible ? "visible " : "") + this.props.alignment}>
-  				<h3> Online Users </h3>
+  				<h3> THE <span id="room">{this.props.broadcast_id}</span> STREAM </h3>
   				<ul className="usersList">
   					{
   						this.props.users.map((user, i) => {
@@ -136,6 +136,7 @@ var UserComponent = React.createClass({
         <button className="userButton hvr-glow" onClick={this.showLeft}>Show Users</button>
         <UsersList
           id="userComponent"
+          broadcast_id={this.props.broadcast_id}
           users={this.props.users}
           ref="left"
           alignment="left"
@@ -263,10 +264,7 @@ var AppChat = React.createClass({
     socket.on('send:message', this.receiveMessage);
   },
   initialize: function(data) {
-    console.log('this ran');
-    console.log(data);
     var users = data.users;
-    console.log(users, 'This is the users');
     var name = data.name;
     this.setState({
       users: users,
@@ -315,6 +313,7 @@ var AppChat = React.createClass({
         <UserComponent
         users={this.state.users}
         id="userComponent"
+        broadcast_id={this.props.broadcast_id}
         />
         <div id="appChat">
           <div className="messageComponent">

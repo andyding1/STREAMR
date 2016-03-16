@@ -89,6 +89,9 @@ body {
   display: flex;
   justify-content: center;
 }
+#room {
+  color: yellow;
+}
 .usersList{
   list-style: none;
   text-align: left;

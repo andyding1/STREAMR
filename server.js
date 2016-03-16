@@ -1,8 +1,9 @@
 var express = require('express');
 var express_app = express();
 express_app.use(express.static("./public"));
+var app = require('http').Server(app);
+
 var userFunctions = require('./users.js');
-//var http = require('http').Server(app);
 //var io = require('socket.io')(http);
 
 //Maintaining users list on server-side, it will be an object with many arrays
@@ -30,15 +31,20 @@ var users = {};
 // MIT License - www.WebRTC-Experiment.com/licence
 // Source Code - https://github.com/muaz-khan/WebRTC-Scalable-Broadcast
 
-var fs = require("fs");
-var path = require('path');
-
 var app = require('http').Server(express_app);
 
-app = app.listen(process.env.PORT || 8888, process.env.IP || "0.0.0.0", function() {
-  var addr = app.address();
-  console.log("Server listening at", addr.address + ":" + addr.port);
+express_app.get('/*', function(req, res){
+  res.sendFile(__dirname + '/public/index.html');
 });
+
+app.listen(8080, function(){
+  console.log('listening on *:8080');
+});
+
+// app = app.listen(process.env.PORT || 8888, process.env.IP || "0.0.0.0", function() {
+//   var addr = app.address();
+//   console.log("Server listening at", addr.address + ":" + addr.port);
+// });
 
 // Muaz Khan   - www.MuazKhan.com
 // MIT License - www.WebRTC-Experiment.com/licence
@@ -85,7 +91,6 @@ function WebRTC_Scalable_Broadcast(app) {
       var alias = data.alias;
       //users.push(alias);
       userFunctions.addUser(users, alias, broadcastRoom);
-      console.log(userFunctions.getUsersList(users, broadcastRoom));
 
       //send the new user their name and list of users
       io.to(broadcastRoom).emit('initialize', {
