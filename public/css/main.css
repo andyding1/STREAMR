@@ -21,4 +21,21 @@
 }
 video {
   width: 45vw;
+  position: relative;
+  top: 5em;
+  margin-bottom: 5em;
+}
+
+@media (max-width: 1445px) {
+  #mainApp {
+    display: flex;
+    flex-direction: column-reverse;
+  }
+}
+
+@media (max-width: 800px) {
+  #mainApp {
+    display: flex;
+    flex-direction: column-reverse;
+  }
 }

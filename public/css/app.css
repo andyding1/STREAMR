@@ -181,10 +181,10 @@ body {
 */
 
 .userButton {
-  width: 8vw;
-  height: 4vh;
+  width: 8.5vw;
+  height: 4.5vh;
   overflow: hidden;
-  font-size: 1em;
+  font-size: 15px;
   border-width: 0;
   outline: none;
   border-radius: 2px;
@@ -247,4 +247,39 @@ body {
 */
 #mainPageRedirect {
   color: yellow;
+}
+
+@media (max-width: 1200px) {
+  .userButton{
+    width: 11vw;
+    height: 5vh;
+  }
+}
+
+@media (max-width: 1000px) {
+  .messageInputArea {
+    height: 20vh;
+  }
+  .aliasForm {
+    width: 40%;
+    margin: 17% auto;
+  }
+  .userButton{
+    width: 11vw;
+    height: 5vh;
+  }
+}
+
+@media (max-width: 800px) {
+  .messageInputArea {
+    height: 20vh;
+  }
+  .aliasForm {
+    width: 50%;
+    margin: 17% auto;
+  }
+  .userButton{
+    width: 12vw;
+    height: 6vh;
+  }
 }
