@@ -4,8 +4,6 @@ express_app.use(express.static("./public"));
 //var http = require('http').Server(app);
 //var io = require('socket.io')(http);
 
-var userColors = require('./colors.js');
-
 var users = [];
 
 //io.on('connection', function(socket){
@@ -21,10 +19,6 @@ var users = [];
 //http.listen(8080, function(){
 //  console.log('listening on *:8080');
 //});
-
-
-
-
 
 
 ////////////////////////
@@ -78,51 +72,48 @@ function WebRTC_Scalable_Broadcast(app) {
     /*
     CHAT SOCKET
     */
-    socket.on('user:enter', function(alias){
-
+    //After user submits the form data on AliasPicker
+    socket.on('user:enter', function(data){
+      //Join the socket room determined by the broadcast_id entered
+      var broadcastRoom = data.broadcast_id;
+      socket.join(broadcastRoom);
       //add the current socket user to the users array
+      var alias = data.alias;
       users.push(alias);
-      //console.log('User CONNECTED');
 
       //send the new user their name and list of users
-      socket.broadcast.emit('initialize', {
+      socket.broadcast.to(broadcastRoom).emit('initialize', {
         name: alias,
         users: users
       });
-      socket.emit('initialize', {
+      socket.to(broadcastRoom).emit('initialize', {
         users: users
       })
 
       // notify other sockets that a new user has joined
-      socket.broadcast.emit('user:join', {
+      socket.broadcast.to(broadcastRoom).emit('user:join', {
         name: alias
       });
 
-      socket.on('send:message', function(data){
-        io.emit('send:message', {
+      socket.to(broadcastRoom).on('send:message', function(data){
+        io.to(broadcastRoom).emit('send:message', {
           user: alias,
           text: data.text,
-          color: userColors.getColor(alias)
         });
       });
 
-      socket.on('color:change', function(data){
-        userColors.addUser(alias, data.color);
-      });
-
       //User leaves chat room
-      socket.on('disconnect', function(){
+      socket.to(broadcastRoom).on('disconnect', function(){
         //console.log('User DISCONNECTED');
         //removes socket user from the user list
         var index = users.indexOf(alias)
         users.splice(index,1);
 
-        socket.broadcast.emit('user:left', {
+        socket.broadcast.to(broadcastRoom).emit('user:left', {
           name: alias,
           users: users
         });
       });
-
     });
 
     /*

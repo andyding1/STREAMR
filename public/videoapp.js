@@ -23,7 +23,7 @@ class VideoApp extends React.Component {
 
         let that = this;
 
-        console.log("handleClick fired!");
+        //console.log("handleClick fired!");
         let connection = new RTCMultiConnection();
         console.log(connection, "THIS IS THE CONNECTION CREATED FROM A USER CLICK!");
         connection.body = this.refs.videos_container;
@@ -116,10 +116,18 @@ class VideoApp extends React.Component {
             return;
         }
 
+        // connection.session = {
+        //     video: this.refs.broadcast_options.value.indexOf('Video') !== -1,
+        //     screen: this.refs.broadcast_options.value.indexOf('Screen') !== -1,
+        //     audio: this.refs.broadcast_options.value.indexOf('Audio') !== -1,
+        //     oneway: true
+        // };
+
+        //Hardcoding this
         connection.session = {
-            video: this.refs.broadcast_options.value.indexOf('Video') !== -1,
-            screen: this.refs.broadcast_options.value.indexOf('Screen') !== -1,
-            audio: this.refs.broadcast_options.value.indexOf('Audio') !== -1,
+            video: true,
+            screen: false,
+            audio: true,
             oneway: true
         };
 
@@ -176,8 +184,7 @@ class VideoApp extends React.Component {
             <div>
                 <div ref="videos_container"></div>
 
-
-                <input onChange={this.handleInputChange} type="text" ref="broadcast_id" placeholder="broadcast-id" value={this.state.room}/>
+                {/*<input onChange={this.handleInputChange} type="text" ref="broadcast_id" placeholder="broadcast-id" value={this.state.room}/>
                 <select ref="broadcast_options">
                     <option>Audio+Video</option>
                     <option title="Works only in Firefox.">Audio+Screen</option>
@@ -188,7 +195,7 @@ class VideoApp extends React.Component {
                         Screen
                     </option>
                 </select>
-                <button id="open-or-join" onClick={this.handleClick}>Open or Join Broadcast</button>
+                <button id="open-or-join" onClick={this.handleClick}>Open or Join Broadcast</button>*/}
             </div>
         );
     }

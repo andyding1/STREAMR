@@ -98,6 +98,7 @@ body {
   height: 50vh;
   width: 50vw;
   overflow: auto;
+  color: black;
   background: white;
   border: 2px solid black;
   /*border-radius: 1px;*/
@@ -146,10 +147,8 @@ body {
   padding-left: 1em;
   /*border-radius: 5px 0 0 5px;*/
 }
-#colorPicker {
-  height: 4vh;
-}
 #sendMessage {
+  height: 4vh;
   background: #009933;
   font-family: inherit;
   font-weight: bold;
