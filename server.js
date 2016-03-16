@@ -74,7 +74,7 @@ function WebRTC_Scalable_Broadcast(app) {
     */
     //After user submits the form data on AliasPicker
     socket.on('user:enter', function(data){
-      //Join the socket room determined by the broadcast_id entered
+      //Join the socket room determined by the broadcast_id entered from AliasPicker
       var broadcastRoom = data.broadcast_id;
       socket.join(broadcastRoom);
       //add the current socket user to the users array
