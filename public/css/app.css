@@ -93,6 +93,9 @@ body {
   list-style: none;
   text-align: left;
 }
+#userComponent{
+  height: 100%;
+}
 .messageComponent{
   /*flex-basis: 70%;*/
   display: flex;
@@ -177,6 +180,7 @@ body {
   width: 8vw;
   height: 4vh;
   overflow: hidden;
+  font-size: 1em;
   border-width: 0;
   outline: none;
   border-radius: 2px;

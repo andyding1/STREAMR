@@ -125,6 +125,26 @@ var UsersList = React.createClass({
 	}
 });
 
+var UserComponent = React.createClass({
+  //for react sliding menu
+  showLeft: function() {
+    this.refs.left.show();
+  },
+  render: function() {
+    return(
+      <div>
+        <button className="userButton hvr-glow" onClick={this.showLeft}>Show Users</button>
+        <UsersList
+          id="userComponent"
+          users={this.props.users}
+          ref="left"
+          alignment="left"
+        />
+      </div>
+    );
+  }
+})
+
 //This component is for any message that is entered from the MessageForm Component
 var Message = React.createClass({
   componentDidUpdate: function(){
@@ -237,14 +257,16 @@ var AppChat = React.createClass({
     }
   },
   componentDidMount: function(){
-    var that = this;
     socket.on('initialize', this.initialize);
     socket.on('user:join', this.userJoins);
     socket.on('user:left', this.userLeaves);
     socket.on('send:message', this.receiveMessage);
   },
   initialize: function(data) {
+    console.log('this ran');
+    console.log(data);
     var users = data.users;
+    console.log(users, 'This is the users');
     var name = data.name;
     this.setState({
       users: users,
@@ -252,7 +274,7 @@ var AppChat = React.createClass({
     });
   },
   userJoins: function(data) {
-    var users = this.state.users;
+    var users = data.users;
     var messages = this.state.messages;
     var name = data.name;
     messages.push({
@@ -287,21 +309,13 @@ var AppChat = React.createClass({
   handleMessage: function(message) {
     socket.emit('send:message', message);
   },
-  //for react sliding menu
-  showLeft: function() {
-    this.refs.left.show();
-  },
   render: function() {
     return (
       <div>
-        <div>
-          <button className="userButton hvr-glow" onClick={this.showLeft}>Show Users</button>
-          <UsersList
-  					users={this.state.users}
-            ref="left"
-            alignment="left"
-  				/>
-        </div>
+        <UserComponent
+        users={this.state.users}
+        id="userComponent"
+        />
         <div id="appChat">
           <div className="messageComponent">
             <MessageList

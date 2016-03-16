@@ -1,12 +1,23 @@
+/*
+  This styles the chat and video portions of the application
+*/
+
 #mainApp {
   display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-around;
+  align-content: stretch;
 }
 #chatApp {
   flex-basis: 50%;
 }
 #videoApp {
-  display: flex;
   flex-basis: 50%;
-  justify-content: center;
-  align-items: center;
+}
+#videoContainer {
+  width: 100%;
+  height: 100%;
+  border: .5em solid black;
+  padding: 1em;
 }

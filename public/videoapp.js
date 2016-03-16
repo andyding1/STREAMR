@@ -182,7 +182,7 @@ class VideoApp extends React.Component {
     render() {
         return (
             <div>
-                <div ref="videos_container"></div>
+                <div ref="videos_container" id="videoContainer"></div>
 
                 {/*<input onChange={this.handleInputChange} type="text" ref="broadcast_id" placeholder="broadcast-id" value={this.state.room}/>
                 <select ref="broadcast_options">

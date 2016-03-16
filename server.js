@@ -1,10 +1,12 @@
 var express = require('express');
 var express_app = express();
 express_app.use(express.static("./public"));
+var userFunctions = require('./users.js');
 //var http = require('http').Server(app);
 //var io = require('socket.io')(http);
 
-var users = [];
+//Maintaining users list on server-side, it will be an object with many arrays
+var users = {};
 
 //io.on('connection', function(socket){
 //  //After user submits an alias
@@ -51,7 +53,6 @@ app = app.listen(process.env.PORT || 8888, process.env.IP || "0.0.0.0", function
 // Ref. discussion: https://github.com/muaz-khan/WebRTC-Experiment/issues/2
 // Source Code: https://github.com/muaz-khan/WebRTC-Scalable-Broadcast
 
-
 function WebRTC_Scalable_Broadcast(app) {
   var io = require('socket.io').listen(app, {
     log: false,
@@ -68,7 +69,9 @@ function WebRTC_Scalable_Broadcast(app) {
   var listOfBroadcasts = {};
 
   io.on('connection', function(socket) {
+    socket.on('ready', function(){
 
+    })
     /*
     CHAT SOCKET
     */
@@ -77,24 +80,29 @@ function WebRTC_Scalable_Broadcast(app) {
       //Join the socket room determined by the broadcast_id entered from AliasPicker
       var broadcastRoom = data.broadcast_id;
       socket.join(broadcastRoom);
+
       //add the current socket user to the users array
       var alias = data.alias;
-      users.push(alias);
+      //users.push(alias);
+      userFunctions.addUser(users, alias, broadcastRoom);
+      console.log(userFunctions.getUsersList(users, broadcastRoom));
 
       //send the new user their name and list of users
-      socket.broadcast.to(broadcastRoom).emit('initialize', {
+      io.to(broadcastRoom).emit('initialize', {
         name: alias,
-        users: users
+        users: userFunctions.getUsersList(users, broadcastRoom)
       });
-      socket.to(broadcastRoom).emit('initialize', {
-        users: users
-      })
+      socket.emit('initialize', {
+        users: userFunctions.getUsersList(users, broadcastRoom)
+      });
 
       // notify other sockets that a new user has joined
       socket.broadcast.to(broadcastRoom).emit('user:join', {
-        name: alias
+        name: alias,
+        users: userFunctions.getUsersList(users, broadcastRoom)
       });
 
+      //show messages to everyone
       socket.to(broadcastRoom).on('send:message', function(data){
         io.to(broadcastRoom).emit('send:message', {
           user: alias,
@@ -106,12 +114,11 @@ function WebRTC_Scalable_Broadcast(app) {
       socket.to(broadcastRoom).on('disconnect', function(){
         //console.log('User DISCONNECTED');
         //removes socket user from the user list
-        var index = users.indexOf(alias)
-        users.splice(index,1);
+        userFunctions.removeUser(users, alias, broadcastRoom);
 
         socket.broadcast.to(broadcastRoom).emit('user:left', {
           name: alias,
-          users: users
+          users: userFunctions.getUsersList(users, broadcastRoom)
         });
       });
     });
@@ -119,7 +126,6 @@ function WebRTC_Scalable_Broadcast(app) {
     /*
       VIDEO SOCKET
     */
-
     var currentUser;
     socket.on('join-broadcast', function(user) {
       currentUser = user;
