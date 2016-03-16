@@ -73,12 +73,12 @@ var AliasPicker = React.createClass({
   			<form onSubmit={this.enterChat} className="aliasForm" autoComplete="off">
   				<div className="header"><p>Enter Alias and Room</p></div>
           <div className="description">
-            <p>Input an Alias and a Room. The first person who enters the room will be the streamer. Any subsequent person who enters the room will be able to view the stream. </p>
+            <p>The first person who enters the room will be the streamer. Any subsequent person who enters the room will be a viewer. </p>
           </div>
           <div className="aliasInput">
             <div className="textInput">
     					<input ref="alias" type="text" className="button inputBox" placeholder="ALIAS" pattern=".{1,}" required title="Enter an Alias" maxLength="14"></input>
-              <input ref="broadcast_id" type="text" className="button inputBox" placeholder="ROOM" pattern=".{1,}" required title="Enter an Alias" maxLength="14"></input>
+              <input ref="broadcast_id" type="text" className="button inputBox" placeholder="ROOM" pattern=".{1,}" required title="Enter a Room" maxLength="14"></input>
             </div>
             <input type="submit" className="button" value="ENTER" id="enter"></input>
           </div>
@@ -322,8 +322,8 @@ var MainApp = React.createClass({
   render: function() {
     return(
       <div id="mainApp">
-        <AppChat broadcast_id={this.props.broadcast_id}/>
-        <VideoApp broadcast_id={this.props.broadcast_id}/>
+        <AppChat id="chatApp" broadcast_id={this.props.broadcast_id}/>
+        <VideoApp id="videoApp" broadcast_id={this.props.broadcast_id}/>
       </div>
     );
   }

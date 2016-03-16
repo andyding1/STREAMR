@@ -129,10 +129,10 @@ body {
   font-weight: bolder;
   padding: .1em;
 }
+
 /*
   Styling message form input box
 */
-
 .messageInput {
   width: 50vw;
   display: flex;

@@ -5,5 +5,8 @@
   flex-basis: 50%;
 }
 #videoApp {
+  display: flex;
   flex-basis: 50%;
+  justify-content: center;
+  align-items: center;
 }

@@ -133,7 +133,7 @@ function WebRTC_Scalable_Broadcast(app) {
         };
       }
 
-      var firstAvailableBroadcaster = getFirstAvailableBraodcater(user);
+      var firstAvailableBroadcaster = getFirstAvailableBroadcaster(user);
       if (firstAvailableBroadcaster) {
         //listOfBroadcasts[user.broadcastid].broadcasters[firstAvailableBroadcaster.userid].numberOfViewers++;
         socket.emit('join-broadcaster', firstAvailableBroadcaster, listOfBroadcasts[user.broadcastid].typeOfStreams);
@@ -168,7 +168,7 @@ function WebRTC_Scalable_Broadcast(app) {
     });
   });
 
-  function getFirstAvailableBraodcater(user) {
+  function getFirstAvailableBroadcaster(user) {
     return listOfBroadcasts[user.broadcastid].broadcaster;
     //var firstResult;
     //for (var userid in broadcasters) {
