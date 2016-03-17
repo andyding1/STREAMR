@@ -4,10 +4,12 @@ express_app.use(express.static("./public"));
 var app = require('http').Server(app);
 
 var userFunctions = require('./users.js');
+var colors = require('./colors.js');
 //var io = require('socket.io')(http);
 
 //Maintaining users list on server-side, it will be an object with many arrays
 var users = {};
+var userColors = {};
 
 //io.on('connection', function(socket){
 //  //After user submits an alias
@@ -107,11 +109,18 @@ function WebRTC_Scalable_Broadcast(app) {
         users: userFunctions.getUsersList(users, broadcastRoom)
       });
 
+      socket.on('color:change', function(color){
+        if(colors.allColors.indexOf(color.charAt(0).toUpperCase() + color.slice(1)) > -1){
+          colors.addUser(userColors, broadcastRoom, alias, color);
+        }
+      })
+
       //show messages to everyone
       socket.to(broadcastRoom).on('send:message', function(data){
         io.to(broadcastRoom).emit('send:message', {
           user: alias,
           text: data.text,
+          color: 'red'
         });
       });
 

@@ -1,7 +1,9 @@
 /*
   This styles the chat and video portions of the application
 */
-
+#headline {
+  font-size: 4em;
+}
 #mainApp {
   display: flex;
   flex-direction: row;

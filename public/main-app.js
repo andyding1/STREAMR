@@ -71,9 +71,9 @@ var AliasPicker = React.createClass({
 		return (
       <div>
   			<form onSubmit={this.enterChat} className="aliasForm" autoComplete="off">
-  				<div className="header"><p>Enter Alias and Room</p></div>
+  				<div className="header"><p>The Fast Broadcast</p></div>
           <div className="description">
-            <p>The first person who enters the room will be the streamer. Any subsequent person who enters the room will be a viewer. </p>
+            <p> Input an Alias and Room </p>
           </div>
           <div className="aliasInput">
             <div className="textInput">
@@ -154,6 +154,10 @@ var Message = React.createClass({
     objDiv.scrollTop = objDiv.scrollHeight;
   },
 	render: function() {
+    var color = this.props.color;
+    var colorStyle = {
+      color: color
+    };
     //adding specific class on admin messages for joining and leaving chat room for styling purposes
     if (this.props.users === ADMIN_USER){
       return (
@@ -167,7 +171,7 @@ var Message = React.createClass({
   		return (
   			<div className="message">
           <strong>{this.props.users}: </strong>
-  				<span>{this.props.text}</span>
+  				<span style={colorStyle}>{this.props.text}</span>
   			</div>
   		);
     }
@@ -187,6 +191,7 @@ var MessageList = React.createClass({
               key={i}
               users={message.user}
               text={message.text}
+              color={message.color}
             />
             </td>
           </tr>
@@ -222,6 +227,15 @@ var MessageForm = React.createClass({
       user: this.props.user,
 			text : this.state.text
 		}
+    //handle color change based on text input
+    //any messageText with '$color *COLORNAME*'
+    var textArray = this.state.text.split(" ")
+    if(textArray.indexOf("$color")>-1){
+      if(textArray[textArray.indexOf("$color")+1]){
+        var color = textArray[textArray.indexOf("$color")+1];
+        socket.emit('color:change', color);
+      }
+    }
 		this.props.onMessageSubmit(message);
 		this.setState({ text: '' });
 	},
@@ -262,6 +276,7 @@ var AppChat = React.createClass({
     socket.on('user:join', this.userJoins);
     socket.on('user:left', this.userLeaves);
     socket.on('send:message', this.receiveMessage);
+    socket.on('color:change', this.receiveColor);
   },
   initialize: function(data) {
     var users = data.users;
@@ -304,6 +319,11 @@ var AppChat = React.createClass({
         messages: messages
       });
   },
+  receiveColor: function(color) {
+    this.setState({
+      color: color
+    });
+  },
   handleMessage: function(message) {
     socket.emit('send:message', message);
   },
@@ -319,6 +339,7 @@ var AppChat = React.createClass({
           <div className="messageComponent">
             <MessageList
               messages={this.state.messages}
+              color={this.state.color}
             />
             <MessageForm
               onMessageSubmit={this.handleMessage}
