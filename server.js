@@ -38,8 +38,8 @@ var app = require('http').Server(express_app);
 express_app.get('/*', function(req, res){
   res.sendFile(__dirname + '/public/index.html');
 });
-
-app.listen(8080, function(){
+var port = process.env.PORT || '8080';
+app.listen(port, function(){
   console.log('listening on *:8080');
 });
 
