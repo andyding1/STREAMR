@@ -58,7 +58,8 @@ var AliasPicker = React.createClass({
 		var alias = this.refs.alias.value;
     socket.emit('user:enter', {
       alias: alias,
-      broadcast_id: this.refs.broadcast_id.value
+      broadcast_id: this.refs.broadcast_id.value,
+      uniqueId: new Date().getTime()
     });
     //this will set state for aliasPicked to true in AppCombined component to render AppChat
     if(this.refs.alias.value && this.refs.broadcast_id.value){

@@ -91,8 +91,11 @@ function WebRTC_Scalable_Broadcast(app) {
 
       //add the current socket user to the users array
       var alias = data.alias;
-      //users.push(alias);
       userFunctions.addUser(users, alias, broadcastRoom);
+
+      //add default color of black to user
+      var userId = data.uniqueId;
+      colors.addUserColor(userColors, userId, 'black');
 
       //send the new user their name and list of users
       io.to(broadcastRoom).emit('initialize', {
@@ -110,17 +113,18 @@ function WebRTC_Scalable_Broadcast(app) {
       });
 
       socket.on('color:change', function(color){
-        if(colors.allColors.indexOf(color.charAt(0).toUpperCase() + color.slice(1)) > -1){
-          colors.addUser(userColors, broadcastRoom, alias, color);
+        var checkColor = color.toLowerCase();
+        if(colors.allColors.indexOf(checkColor) > -1){
+          colors.addUserColor(userColors, userId, checkColor);
         }
-      })
+      });
 
       //show messages to everyone
       socket.to(broadcastRoom).on('send:message', function(data){
         io.to(broadcastRoom).emit('send:message', {
           user: alias,
           text: data.text,
-          color: 'red'
+          color: colors.getColor(userColors, userId)
         });
       });
 
