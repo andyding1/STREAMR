@@ -5,6 +5,7 @@ html {
 
 body {
   /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#a90329+0,8f0222+44,6d0019+100;Brown+Red+3D */
+
   background: #a90329; /* Old browsers */
   background: -moz-linear-gradient(top,  #a90329 0%, #8f0222 44%, #6d0019 100%); /* FF3.6-15 */
   background: -webkit-linear-gradient(top,  #a90329 0%,#8f0222 44%,#6d0019 100%); /* Chrome10-25,Safari5.1-6 */
@@ -249,6 +250,9 @@ body {
 }
 
 @media (max-width: 1200px) {
+  .messageInputArea {
+    height: 20vh;
+  }
   .userButton{
     width: 11vw;
     height: 5vh;
@@ -256,6 +260,7 @@ body {
 }
 
 @media (max-width: 1000px) {
+
   .messageInputArea {
     height: 20vh;
   }
