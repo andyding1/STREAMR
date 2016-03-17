@@ -28,7 +28,7 @@ video {
   margin-bottom: 5em;
 }
 
-@media (max-width: 1445px) {
+@media (max-width: 1200px) {
   #mainApp {
     display: flex;
     flex-direction: column-reverse;
