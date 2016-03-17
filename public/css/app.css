@@ -5,12 +5,12 @@ html {
 
 body {
   /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#a90329+0,8f0222+44,6d0019+100;Brown+Red+3D */
-
   background: #a90329; /* Old browsers */
   background: -moz-linear-gradient(top,  #a90329 0%, #8f0222 44%, #6d0019 100%); /* FF3.6-15 */
   background: -webkit-linear-gradient(top,  #a90329 0%,#8f0222 44%,#6d0019 100%); /* Chrome10-25,Safari5.1-6 */
   background: linear-gradient(to bottom,  #a90329 0%,#8f0222 44%,#6d0019 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
   background-repeat:no-repeat;
+  background-attachment: fixed;
   filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#a90329', endColorstr='#6d0019',GradientType=0 ); /* IE6-9 */
   font-family: 'Lato', sans-serif;
   color: #FDFCFB;
@@ -105,6 +105,7 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
+  margin-bottom: 1em;
 }
 .messageInputArea{
   height: 50vh;

@@ -50,6 +50,7 @@
 }
 .menu > div.left {
   background: #273D7A;
+  background-attachment: fixed;
   left: -20vw;
 }
 .menu > div.visible.left {
