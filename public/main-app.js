@@ -227,7 +227,7 @@ var MessageForm = React.createClass({
 		var message = {
       user: this.props.user,
 			text : this.state.text
-		}
+		};
     //handle color change based on text input
     //any messageText with '$color *COLORNAME*'
     var textArray = this.state.text.split(" ")
@@ -330,7 +330,7 @@ var AppChat = React.createClass({
   },
   render: function() {
     return (
-      <div>
+      <div id="AppChatContainer">
         <UserComponent
         users={this.state.users}
         id="userComponent"

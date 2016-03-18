@@ -11,12 +11,6 @@
   justify-content: space-around;
   align-content: stretch;
 }
-/*#chatApp {
-  flex-basis: 50%;
-}
-#videoApp {
-  flex-basis: 50%;
-}*/
 #videoContainer {
   padding: 8px;
   border-radius: 10px;
